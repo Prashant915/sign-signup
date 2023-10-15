@@ -25,4 +25,5 @@ urlpatterns = [
     path('home/',views.home,name='home'),
     path('logout/',views.log_out,name='logout'),
     path('editprofile/',views.edit,name="edit"),
+    path('changepassword/',views.user_chg_form,name="changepass")
 ]

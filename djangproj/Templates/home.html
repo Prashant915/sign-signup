@@ -12,8 +12,10 @@
 </head>
 <body>
     <h2>Home Page</h2><br>
+    <h4>Hello {{name}}</h4>
     <a class="btn btn-success btn-lg" href="{% url 'logout' %}">Logout</a>
     <a class="btn btn-warning btn-lg" href="{% url 'edit' %}">Edit</a>
+    <a class="btn btn-secondary btn-lg" href="{% url 'changepass' %}">Change Password</a>
 
 </body>
 </html>

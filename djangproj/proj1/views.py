@@ -1,8 +1,9 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.contrib.auth.models import User
-from django.contrib.auth import login,logout,authenticate
+from django.contrib.auth import login,logout,authenticate,update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
 from .forms import Edituserform
 
 # Create your views here.
@@ -17,7 +18,7 @@ def signin(request):
                 return redirect('home')
         return render(request,'sign-in.html')
     else:
-        return HttpResponse("You are already login")
+        return redirect("/home/")
 
 def signup(request):
     if request.method=='POST':
@@ -34,9 +35,10 @@ def signup(request):
             my_user.save()
             return redirect('/')
     return render(request,'signup.html')
+
 @login_required(login_url='signin')
 def home(request):
-    return render(request,'home.html')
+    return render(request,'home.html',{'name':request.user})
 
 def log_out(request):
     logout(request)
@@ -44,7 +46,26 @@ def log_out(request):
 
 def edit(request):
     if request.user.is_authenticated:
-        fm=Edituserform(instance=request.user)
+        if request.method=="POST":
+            fm=Edituserform(request.POST,instance=request.user)
+            if fm.is_valid():
+                fm.save()
+                return redirect('/home/')
+        else:
+            fm=Edituserform(instance=request.user)
         return render(request,'info.html',{'form':fm})
     else:
         return redirect('/')
+    
+@login_required(login_url='signin')   
+def user_chg_form(request):
+    if request.method=="POST":
+        lg=PasswordChangeForm(user=request.user,data=request.POST)
+        if lg.is_valid():
+            lg.save()
+            update_session_auth_hash(request,lg.user)
+            return redirect('/home/')
+    else:
+        lg=PasswordChangeForm(user=request.user)
+    return render(request,'changepass.html',{'form':lg})
+    
